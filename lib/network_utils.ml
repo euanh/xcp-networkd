@@ -33,6 +33,7 @@ let modprobe = "/sbin/modprobe"
 let ethtool = ref "/sbin/ethtool"
 let bonding_dir = "/proc/net/bonding/"
 let fcoedriver = ref "/opt/xensource/libexec/fcoe_driver"
+let vlan_dir = "/proc/net/vlan/"
 
 let call_script ?(log_successful_output=false) ?(timeout=Some 60.0) script args =
 	try
@@ -335,6 +336,13 @@ info "Found at [ %s ]" (String.concat ", " (List.map string_of_int indices));
 	let destroy_vlan name =
 		if List.mem name (Sysfs.list ()) then
 			ignore (call ~log:true ["link"; "delete"; name])
+
+	let is_vlan_interface interface vlan =
+		try
+			ignore (Unix.stat (Printf.sprintf "%s%s" vlan_dir (vlan_name interface vlan)));
+			true
+		with Unix.Unix_error (Unix.ENOENT, _, _) ->
+			false
 end
 
 module Linux_bonding = struct
