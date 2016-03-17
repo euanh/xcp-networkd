@@ -687,12 +687,7 @@ module Bridge = struct
 	let add_port _ dbg ?bond_mac ~bridge ~name ~interfaces ?(bond_properties=[]) () =
 		Debug.with_thread_associated dbg (fun () ->
 			let config = get_config bridge in
-			let ports =
-				if List.mem_assoc name config.ports then
-					List.remove_assoc name config.ports
-				else
-					config.ports
-			in
+			let ports = List.remove_assoc name config.ports in
 			let ports = (name, {interfaces; bond_mac; bond_properties}) :: ports in
 			update_config bridge {config with ports};
 			debug "Adding port %s to bridge %s with interfaces %s%s" name bridge
